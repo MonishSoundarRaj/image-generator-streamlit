@@ -3,7 +3,7 @@ import replicate as rp
 import os
 import requests
 
-st.markdown("<h1 style='color: #041359; font-family: sans-serif; text-align: center'>IMAGINATE HUB</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='color: #A2CFFE; font-family: sans-serif; text-align: center'>IMAGINATE HUB</h1>", unsafe_allow_html=True)
 
 with st.expander("**Prompt & Result Sample**"):
     col1, col2 = st.columns(2) 
