@@ -2,6 +2,8 @@
 
 Welcome to Imaginate Hub, a state-of-the-art image generation platform where imagination meets machine learning. Utilizing advanced models, this app offers a seamless experience for users to input prompts and visualize the resulting images.
 
+🚀 **Explore Live Application**: Dive into the Imaginate Hub experience right now! Check out the [Live Model Here](https://image-generator-app.streamlit.app/).
+
 ![Imaginate Hub Screenshot](./ImaginateHub-github.png) 
 
 ## Features
@@ -67,7 +69,9 @@ pip install -r requirements.txt
 4. Run the Streamlit app:
 ```
 streamlit run app.py
+```
 
 ## License
 
 This project falls under the MIT License. For more details, please check the [LICENSE](LICENSE) file.
+
