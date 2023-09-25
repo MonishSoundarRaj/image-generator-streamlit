@@ -12,6 +12,9 @@ st.markdown("<h1 style='color: #A2CFFE; font-family: sans-serif; text-align: cen
 if not hasattr(st, "global_image_generated_counter"):
     st.global_image_generated_counter = 0
 
+if "user_API_key" in st.session_state:
+    st.session_state.user_API_key = None
+
 with st.form("model_selection_form"):
     st.markdown("<h4 style='text-align: center'>Choose a model from the dropdown to begin</h4>", unsafe_allow_html=True)
     option = st.selectbox("**Select the model you want to use**", (None, "Stable Diffusion", "Anything-v4.0", "Waifu Diffusion", "Vintedios Diffusion"), index=1)
@@ -32,9 +35,10 @@ if option is not None:
             st.progress(st.global_image_generated_counter, f"'IMAGINATE HUB' community can generate {200-st.global_image_generated_counter} more images")
             
     else: 
-        user_API_key = st.sidebar.text_input(label="Enter your replicate API key:", type="password")
-        if not re.match("^r8_", user_API_key) or not len(user_API_key) > 30:
-            st.sidebar.error("Please enter a correct API key. Please check the below link to learn how to get a replicate API key.")   
+        st.session_state.user_API_key = st.sidebar.text_input(label="Enter your replicate API key:", type="password")
+        if st.session_state.user_API_key is not None: 
+            if not re.match("^r8_", st.session_state.user_API_key) or not len(st.session_state.user_API_key) > 30:
+                st.sidebar.error("Please enter a correct API key. Please check the below link to learn how to get a replicate API key.")   
         st.sidebar.markdown("<h4><a href='https://gist.github.com/MonishSoundarRaj/76d1d6ef9a806d879ef4357ae5111f00'>How to get replicate API key?</a></h4>", unsafe_allow_html=True)
     
     with st.sidebar:
@@ -105,26 +109,28 @@ if option is not None:
         prompt_submit = st.form_submit_button("Submit Prompt")
         
     if api_key_option != "Community API key":
-        os.environ["REPLICATE_API_TOKEN"] = user_API_key
+        os.environ["REPLICATE_API_TOKEN"] = st.session_state.user_API_key
         
     if prompt_submit:
-        if user_API_key:
+        model_selected = None
+        if option == "Stable Diffusion":
+            model_selected = "stability-ai/stable-diffusion:ac732df83cea7fff18b8472768c88ad041fa750ff7682a21affe81863cbe77e4"
+            input={"prompt": prompt,"num_inference_steps":sd_num_inference_steps, "scheduler":sd_scheduler_options, **({"seed": int(sd_seed)} if int(sd_seed) > 0 else {})}
+        elif option == "Anything-v4.0":
+            model_selected = "cjwbw/anything-v4.0:42a996d39a96aedc57b2e0aa8105dea39c9c89d9d266caf6bb4327a1c191b061"
+            input={"prompt": prompt, "num_outputs":int(at_num_outputs), "num_inference_steps":at_num_inference_steps, "scheduler":at_scheduler_options, **({"seed": int(at_seed)} if int(at_seed) > 0 else {})}
+        elif option == "Waifu Diffusion":
+            model_selected = "cjwbw/waifu-diffusion:25d2f75ecda0c0bed34c806b7b70319a53a1bccad3ade1a7496524f013f48983"
+            input={"prompt": prompt, "num_outputs":int(wd_num_outputs), "num_inference_steps":wd_num_inference_steps, **({"seed": int(wd_seed)} if int(wd_seed) > 0 else {})}
+        else:
+            model_selected = "22-hours/vintedois-diffusion:28cea91bdfced0e2dc7fda466cc0a46501c0edc84905b2120ea02e0707b967fd"
+            input={"prompt": prompt, "num_inference_steps":vd_num_inference_steps, "scheduler":vd_scheduler_options, **({"seed": int(vd_seed)} if int(vd_seed) > 0 else {})}
+            
+        if api_key_option != "Community API key" and st.session_state.user_API_key == None:
+            st.error("Enter your API key in the sidebar or select 'Community API key' option.")
+        else:
             st.success("Your prompt has been submitted successfully.")
-            with st.spinner("We are working on your image, please do not change or resubmit anything now."):
-                model_selected = None
-                if option == "Stable Diffusion":
-                    model_selected = "stability-ai/stable-diffusion:ac732df83cea7fff18b8472768c88ad041fa750ff7682a21affe81863cbe77e4"
-                    input={"prompt": prompt,"num_inference_steps":sd_num_inference_steps, "scheduler":sd_scheduler_options, **({"seed": int(sd_seed)} if int(sd_seed) > 0 else {})}
-                elif option == "Anything-v4.0":
-                    model_selected = "cjwbw/anything-v4.0:42a996d39a96aedc57b2e0aa8105dea39c9c89d9d266caf6bb4327a1c191b061"
-                    input={"prompt": prompt, "num_outputs":int(at_num_outputs), "num_inference_steps":at_num_inference_steps, "scheduler":at_scheduler_options, **({"seed": int(at_seed)} if int(at_seed) > 0 else {})}
-                elif option == "Waifu Diffusion":
-                    model_selected = "cjwbw/waifu-diffusion:25d2f75ecda0c0bed34c806b7b70319a53a1bccad3ade1a7496524f013f48983"
-                    input={"prompt": prompt, "num_outputs":int(wd_num_outputs), "num_inference_steps":wd_num_inference_steps, **({"seed": int(wd_seed)} if int(wd_seed) > 0 else {})}
-                else:
-                    model_selected = "22-hours/vintedois-diffusion:28cea91bdfced0e2dc7fda466cc0a46501c0edc84905b2120ea02e0707b967fd"
-                    input={"prompt": prompt, "num_inference_steps":vd_num_inference_steps, "scheduler":vd_scheduler_options, **({"seed": int(vd_seed)} if int(vd_seed) > 0 else {})}
-                    
+            with st.spinner("We are working on your image, please do not change or resubmit anything now."):   
                 try:
                     output = rp.run(
                         model_selected,
@@ -152,10 +158,6 @@ if option is not None:
                 if api_key_option == "Community API key":
                     st.global_image_generated_counter += 1
                 
-                placeholder = st.empty()
-
-        else:
-            st.write("Enter your key in the sidebar.")
 else:
     pass
 
