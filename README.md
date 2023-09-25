@@ -4,7 +4,7 @@ Welcome to Imaginate Hub, a state-of-the-art image generation platform where ima
 
 🚀 **Explore Live Application**: Dive into the Imaginate Hub experience right now! Check out the [Live Model Here](https://image-generator-app.streamlit.app/).
 
-![Imaginate Hub Screenshot](./imagenatehub_vs.png) 
+![Imaginate Hub Screenshot](./imagenatehub_v2.png) 
 
 ## Features
 
