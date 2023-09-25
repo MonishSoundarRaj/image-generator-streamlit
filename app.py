@@ -116,6 +116,7 @@ if option is not None:
     placeholder.markdown("<div style='margin: 20px;'><h3 style='text-align: center; padding: 50px'>Image will be displayed here once generated.</h3></div>", unsafe_allow_html=True)
     
     if prompt_submit:
+        placeholder.empty()
         model_selected = None
         if option == "Stable Diffusion":
             model_selected = "stability-ai/stable-diffusion:ac732df83cea7fff18b8472768c88ad041fa750ff7682a21affe81863cbe77e4"
@@ -133,7 +134,7 @@ if option is not None:
         if api_key_option != "Community API key" and st.session_state.user_API_key == None:
             st.error("Enter your API key in the sidebar or select 'Community API key' option.")
         else:
-            st.success("Your prompt has been submitted successfully.")
+            st.toast("Your prompt has been submitted successfully.")
             with st.spinner("We are working on your image, please do not change or resubmit anything now."):   
                 try:
                     output = rp.run(
@@ -144,11 +145,11 @@ if option is not None:
                     st.error("Please enter NSFW prompt, if you think you have entered a NSFW prompt and please reclick on 'Submit Prompt'")
                 
                 if option == "Stable Diffusion" or option == "Vintedios Diffusion":
-                    placeholder.empty()
+                    st.success("If you like the generated image download it from the link before changing the parameters.")
                     st.image(output)
                     st.success(f"You can download the image by going here: {output[0]}")
                 else:
-                    placeholder.empty()
+                    st.success("If you like the generated image download it from the link before changing the parameters.")
                     if len(output) > 1:
                         for idx, item in enumerate(output):
                             col1, col2 = st.columns(2)
@@ -159,7 +160,7 @@ if option is not None:
                     else:
                         st.image(output)
                     st.success(f"You can download the image by going here: {output}") 
-                               
+                
                 if api_key_option == "Community API key":
                     st.global_image_generated_counter += 1
                 
