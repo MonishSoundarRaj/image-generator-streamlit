@@ -110,7 +110,11 @@ if option is not None:
         
     if api_key_option != "Community API key":
         os.environ["REPLICATE_API_TOKEN"] = st.session_state.user_API_key
-        
+    
+    placeholder = st.empty()
+    
+    placeholder.markdown("<div style='margin: 20px;'><h3 style='text-align: center; padding: 50px'>Image will be displayed here once generated.</h3></div>", unsafe_allow_html=True)
+    
     if prompt_submit:
         model_selected = None
         if option == "Stable Diffusion":
@@ -136,14 +140,15 @@ if option is not None:
                         model_selected,
                         input = input,
                     )
-                    
                 except NSFWError as error:
                     st.error("Please enter NSFW prompt, if you think you have entered a NSFW prompt and please reclick on 'Submit Prompt'")
                 
                 if option == "Stable Diffusion" or option == "Vintedios Diffusion":
+                    placeholder.empty()
                     st.image(output)
                     st.success(f"You can download the image by going here: {output[0]}")
                 else:
+                    placeholder.empty()
                     if len(output) > 1:
                         for idx, item in enumerate(output):
                             col1, col2 = st.columns(2)
